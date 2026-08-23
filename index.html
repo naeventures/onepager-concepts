@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theodor-Gabriel Nae, three one-page WordPress builds</title>
+<meta name="description" content="One brief, three one-page WordPress builds taken in three different design directions. Real Gutenberg block themes, hand-written CSS, no page builder.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://naeventures.github.io/onepager-concepts/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Theodor-Gabriel Nae, three one-page WordPress builds">
+<meta property="og:description" content="One brief, three one-page WordPress builds taken in three different design directions. Real Gutenberg block themes, no page builder.">
+<meta property="og:url" content="https://naeventures.github.io/onepager-concepts/">
+<meta property="og:image" content="https://naeventures.github.io/onepager-concepts/assets/index-og.webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The three pages side by side: a dark graphite one, an oxblood poster one, a concrete drawing-sheet one.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231b1d21'/%3E%3Cpath d='M9 23V9h2.6l9 10.4V9H23v14h-2.6L11.4 12.6V23z' fill='%23faf9f7'/%3E%3C/svg%3E">
+<style>
+/* One page, no framework, no webfont, no script. The three sites each carry
+ * their own typography and each owns a ground colour; this index deliberately
+ * does not compete with them, so it sets the system UI stack on paper and
+ * spends its craft on rhythm, scale and one closing band of ink.
+ *
+ * Every colour pair here is computed with tools/contrast.py and recorded in
+ * lighthouse/portfolio-index/contrast.txt, not sampled by eye. The rows in that
+ * file are read off the served page's computed styles rather than off this
+ * block, because a table written from a stylesheet's intent proves the intent
+ * and not the page. Site 03 paid for that lesson on 23 Aug 2026. */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+	--paper: #faf9f7;
+	--ink: #1b1d21;
+	--muted: #5b6068;
+	--link: #2c4f6b;
+	--hair: #d8d5cf;
+	/* The dark band's own text colour. --muted goes the wrong way on a dark
+	 * ground, 2.60 : 1, so the band takes a second secondary tone at 7.32 : 1
+	 * rather than reusing one that is only secondary on paper. */
+	--ink-soft: #a7abb2;
+	--ink-hair: #3a3d43;
+	--measure: 34rem;
+	--sheet: 74rem;
+	--edge: clamp(1.25rem, 5vw, 4rem);
+	--gap: clamp(2rem, 4vw, 3.5rem);
+}
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+body {
+	margin: 0;
+	background: var(--paper);
+	color: var(--ink);
+	font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+		"Helvetica Neue", Arial, sans-serif;
+	font-size: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+	line-height: 1.55;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Three bands, and the bands are the reason this page has a shape: a masthead
+ * closed by a full-bleed hairline, the specimens on paper, and the disclosure
+ * in ink at the bottom so the page ends instead of trailing off. The band is
+ * full width and the reading column inside it is not. */
+.band { padding-inline: var(--edge); }
+.wrap { max-width: var(--sheet); margin-inline: auto; }
+
+.band--head {
+	padding-block: clamp(3rem, 8vw, 5.5rem) clamp(2rem, 5vw, 3rem);
+	border-bottom: 1px solid var(--hair);
+}
+
+.band--work { padding-block: clamp(2.5rem, 6vw, 4rem) clamp(3rem, 8vw, 5rem); }
+
+.band--foot {
+	padding-block: clamp(2.5rem, 6vw, 3.5rem);
+	background: var(--ink);
+	color: var(--ink-soft);
+}
+
+.label {
+	margin: 0 0 0.75rem;
+	font-size: 0.75rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+h1 {
+	margin: 0 0 1rem;
+	font-size: clamp(1.75rem, 1.1rem + 2.6vw, 3rem);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	line-height: 1.08;
+}
+
+.lede { max-width: var(--measure); margin: 0; }
+.lede + .lede { margin-top: 0.75rem; color: var(--muted); }
+
+/* The four facts a WordPress client actually asks about, in a row, because
+ * every one of them is checkable by viewing source on any of the three pages.
+ * No score is claimed here: Lighthouse numbers live in each site's own
+ * lighthouse/mobile.json, and a number printed on a portfolio index is a
+ * screenshot of a good day rather than a measurement. */
+.spec {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+	gap: 1.25rem var(--gap);
+	max-width: var(--sheet);
+	margin: clamp(1.75rem, 4vw, 2.5rem) 0 0;
+}
+
+.spec div { border-top: 1px solid var(--hair); padding-top: 0.5rem; }
+
+.spec dt {
+	font-size: 0.6875rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.spec dd {
+	margin: 0.25rem 0 0;
+	font-size: 0.9375rem;
+	font-weight: 600;
+}
+
+.sites { margin: 0; padding: 0; list-style: none; }
+
+.site { padding-block: clamp(2.25rem, 5vw, 3.25rem); }
+.site + .site { border-top: 1px solid var(--hair); }
+
+.site__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.5rem 1.25rem;
+	margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+/* The numeral is the only piece of scale on this page, and it is a sheet
+ * number, not a ranking: the three directions are alternatives to one brief.
+ * It sits in --muted at 6.02 : 1, which clears normal-text AA at any size, so
+ * nothing here leans on the large-text threshold. */
+.site__no {
+	font-size: clamp(1.75rem, 1.2rem + 2vw, 2.75rem);
+	font-weight: 600;
+	line-height: 1;
+	letter-spacing: -0.02em;
+	color: var(--muted);
+	font-variant-numeric: tabular-nums;
+}
+
+.site__sector {
+	font-size: 0.75rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.site__body { display: grid; gap: var(--gap); }
+
+.shot {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 1400 / 875;
+	border: 1px solid var(--hair);
+	background: #ffffff;
+}
+
+.site h2 {
+	margin: 0;
+	font-size: clamp(1.25rem, 1.05rem + 0.9vw, 1.625rem);
+	font-weight: 600;
+	letter-spacing: -0.015em;
+	line-height: 1.2;
+}
+
+.site h2 a { color: inherit; text-decoration: none; }
+.site h2 a:hover, .site h2 a:focus-visible { text-decoration: underline; }
+
+.place {
+	margin: 0.375rem 0 0;
+	font-size: 0.8125rem;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.line { margin: 1rem 0 0; }
+.dir { margin: 0.75rem 0 0; color: var(--muted); }
+
+.type {
+	margin: 1rem 0 0;
+	font-size: 0.8125rem;
+	letter-spacing: 0.04em;
+	color: var(--muted);
+}
+
+/* Underlined, not coloured only. A link that differs from its neighbours by
+ * hue alone has to clear 3 : 1 against them (WCAG 1.4.1, technique G183), and
+ * this one sits in its own line where that comparison is awkward to defend.
+ * An underline is the second signal, so the question never arises. */
+.open { margin: 1.25rem 0 0; font-size: 0.9375rem; }
+.open a { color: var(--link); text-underline-offset: 0.15em; }
+
+@media (min-width: 60em) {
+	/* Golden-ish split rather than halves: the screenshot is the evidence and
+	 * the copy is the caption, so they should not get equal weight. minmax(0,
+	 * ...) on the image column is what stops a 1400px intrinsic width from
+	 * pushing the grid wider than its container. */
+	.site__body {
+		grid-template-columns: minmax(0, 1.7fr) minmax(15rem, 1fr);
+		align-items: start;
+	}
+}
+
+.foot { max-width: var(--measure); }
+.foot p { margin: 0; font-size: 0.8125rem; }
+.foot p + p { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--ink-hair); }
+
+a:focus-visible {
+	outline: 2px solid var(--ink);
+	outline-offset: 3px;
+}
+
+
+/* Motion, under the same contract as the three sites: transform only, inside
+ * @supports, dead under prefers-reduced-motion, and zero JavaScript. No
+ * opacity on anything carrying text, so every ratio above is true at every
+ * frame rather than only at the end of the animation. */
+@media (prefers-reduced-motion: no-preference) {
+	@supports (animation-timeline: view()) {
+		.site__body, .site__head {
+			animation: idx-rise linear both;
+			animation-timeline: view();
+			animation-range: entry 8% entry 60%;
+		}
+
+		@keyframes idx-rise {
+			from { transform: translateY(1.25rem); }
+			to { transform: none; }
+		}
+	}
+}
+
+@media print {
+	.band--foot { background: #ffffff; color: #000000; }
+	.shot { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<header class="band band--head">
+	<div class="wrap">
+		<p class="label">Portfolio</p>
+		<h1>Three one-page WordPress builds</h1>
+		<p class="lede">One brief, taken in three different directions by Theodor-Gabriel Nae. Real
+			Gutenberg block themes, hand-written CSS, and every graphic on the three pages drawn for
+			them.</p>
+		<p class="lede">The three companies are invented for this portfolio, so nothing on the pages is
+			a claim about a real business.</p>
+		<dl class="spec">
+			<div>
+				<dt>Built with</dt>
+				<dd>Gutenberg block themes</dd>
+			</div>
+			<div>
+				<dt>Page builder</dt>
+				<dd>None</dd>
+			</div>
+			<div>
+				<dt>JavaScript</dt>
+				<dd>None, one JSON-LD block</dd>
+			</div>
+			<div>
+				<dt>Imagery</dt>
+				<dd>Drawn, not stock</dd>
+			</div>
+		</dl>
+	</div>
+</header>
+
+<main class="band band--work">
+	<div class="wrap">
+		<ul class="sites">
+			<li class="site">
+				<div class="site__head">
+					<span class="site__no">01</span>
+					<span class="site__sector">Holding company</span>
+				</div>
+				<div class="site__body">
+					<a href="one/"><img class="shot" src="assets/one.webp" width="1400" height="875"
+						decoding="async"
+						alt="The Aldmarsh Holdings page on a graphite ground, its wordmark in a high-contrast serif beside a drawn copper rosette, with the phone layout inset."></a>
+					<div>
+						<h2><a href="one/">Aldmarsh Holdings</a></h2>
+						<p class="place">London</p>
+						<p class="line">A private holding company. It owns a small number of businesses
+							and intends to keep them.</p>
+						<p class="dir">Dark all the way down, one bone-coloured band under the founder,
+							copper on the rules and the links. The engine-turned rosette is three
+							drawn layers that counter-rotate as the hero scrolls.</p>
+						<p class="type">Fraunces and Libre Franklin</p>
+						<p class="open"><a href="one/">Open the site -&gt;</a></p>
+					</div>
+				</div>
+			</li>
+			<li class="site">
+				<div class="site__head">
+					<span class="site__no">02</span>
+					<span class="site__sector">Advisory practice</span>
+				</div>
+				<div class="site__body">
+					<a href="two/"><img class="shot" src="assets/two.webp" width="1400" height="875"
+						loading="lazy" decoding="async"
+						alt="The Halewick Advisory page as an oxblood poster, the wordmark knocked out of the field in heavy expanded sans, with the phone layout inset."></a>
+					<div>
+						<h2><a href="two/">Halewick Advisory</a></h2>
+						<p class="place">Manchester</p>
+						<p class="line">An advisory practice of one person, for decisions that are hard
+							to reverse.</p>
+						<p class="dir">A poster rather than a document: oxblood fields alternating with
+							paper, everything snapped to a six-column grid, and four oversized arcs
+							that finish their stroke once. One variable family across its axes.</p>
+						<p class="type">Archivo, one file, two axes</p>
+						<p class="open"><a href="two/">Open the site -&gt;</a></p>
+					</div>
+				</div>
+			</li>
+			<li class="site">
+				<div class="site__head">
+					<span class="site__no">03</span>
+					<span class="site__sector">Industrial group</span>
+				</div>
+				<div class="site__body">
+					<a href="three/"><img class="shot" src="assets/three.webp" width="1400" height="875"
+						loading="lazy" decoding="async"
+						alt="The Ostwyn Industrial Group page as a technical drawing sheet, title-block masthead, dimension rules in the margin and a drawn exploded assembly, with the phone layout inset."></a>
+					<div>
+						<h2><a href="three/">Ostwyn Industrial Group</a></h2>
+						<p class="place">Sheffield</p>
+						<p class="line">Machining, fabrication and industrial electronics businesses in
+							the north of England, bought to be kept.</p>
+						<p class="dir">A drawing sheet. The title block is the sticky masthead, the
+							dimension rules live out in the margins, and the exploded assembly
+							separates along its isometric axis as you scroll.</p>
+						<p class="type">Space Grotesk and IBM Plex Mono</p>
+						<p class="open"><a href="three/">Open the site -&gt;</a></p>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</main>
+
+<footer class="band band--foot">
+	<div class="wrap">
+		<div class="foot">
+			<p>Aldmarsh Holdings, Halewick Advisory and Ostwyn Industrial Group are demonstration
+				brands, not trading companies. No real company, person, client or result is represented
+				anywhere in the three builds, and each page repeats that in its own footer.</p>
+			<p>Built August 2026. Three separate block themes, three separate type pairings, one shared
+				brief. Fonts are OFL and shipped with their licences.</p>
+		</div>
+	</div>
+</footer>
+
+</body>
+</html>

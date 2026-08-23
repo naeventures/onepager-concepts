@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ostwyn Industrial Group">
+  <title>Ostwyn Industrial Group</title>
+  <!--
+    v2. One letter, not the two letter monogram on the page. At 16 pixels in a
+    browser tab two capitals close up into one grey mark, and a tab has to be
+    legible before it is elegant.
+
+    The mark is the punch stamp from the founder section at tab size: the
+    isometric lozenge from tools/art-axo.py, filled solid, with the letter
+    reversed out of it. Same construction as the page, same two colours, so the
+    icon is a detail of the drawing rather than a new drawing. The lozenge
+    corners are the stamp's own, scaled: a rhombus 1.732 wide for 1 tall, which
+    is what a square reads as in isometric projection.
+
+    Concrete ground, not graphite. The page opens on concrete and the graphite
+    strip is a band pinned across the top of it, so a near black tab would
+    stand for the chrome instead of for the sheet. It also keeps the three tabs
+    apart: site 01 is graphite, site 02 is oxblood, this one is paper.
+
+    The face is a system grotesque, not the shipped Space Grotesk. An SVG
+    favicon cannot carry a webfont without embedding the whole file into it,
+    which would cost two orders of magnitude more than everything else here,
+    and O is one of the few capitals a grotesque fallback does not distort.
+  -->
+  <rect width="64" height="64" fill="#e9e7e2"/>
+  <path d="M32 12 L62 32 L32 52 L2 32 Z" fill="#191c1e"/>
+  <text x="32" y="32" text-anchor="middle" dominant-baseline="central"
+        fill="#e9e7e2" font-family="Helvetica, Arial, sans-serif"
+        font-size="22" font-weight="500" letter-spacing="-0.4">O</text>
+</svg>

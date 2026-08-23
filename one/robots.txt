@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://naeventures.github.io/onepager-concepts/one/sitemap.xml

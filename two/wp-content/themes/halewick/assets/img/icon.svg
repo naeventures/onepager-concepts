@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Halewick Advisory">
+  <title>Halewick Advisory</title>
+  <!--
+    One letter, not the three letter monogram on the page. At 16 pixels in a
+    browser tab three capitals close up into one grey smudge, and a tab has to
+    be legible before it is elegant.
+
+    Oxblood ground rather than the v1 light one: the page this stands for opens
+    on a full bleed oxblood field, and a near white tab next to it reads as a
+    different site. The paper square inset is the founder's monogram plate at
+    tab size, the one construction on the page that puts paper inside the
+    field, so the icon is a detail of the page rather than a new drawing.
+
+    The face is a system grotesque, not the shipped Archivo. An SVG favicon
+    cannot carry a webfont without embedding the whole file into it, which
+    would cost two orders of magnitude more than everything else here, and H
+    is one of the few capitals a grotesque fallback does not distort. The
+    letter is stretched horizontally to stand in for the expanded cut the
+    wordmark is actually set in.
+  -->
+  <rect width="64" height="64" fill="#5b1f2a"/>
+  <rect x="10" y="10" width="44" height="44" fill="#faf9f7"/>
+  <g transform="translate(32 32) scale(1.18 1) translate(-32 -32)">
+    <text x="32" y="32" text-anchor="middle" dominant-baseline="central"
+          fill="#111214" font-family="Helvetica, Arial, sans-serif"
+          font-size="30" font-weight="700" letter-spacing="-0.5">H</text>
+  </g>
+</svg>

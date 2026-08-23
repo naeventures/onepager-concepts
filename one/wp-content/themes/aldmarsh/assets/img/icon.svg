@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Aldmarsh Holdings">
+  <title>Aldmarsh Holdings</title>
+  <rect width="64" height="64" fill="#101318"/>
+  <rect x="6.5" y="6.5" width="51" height="51" fill="#191d24" stroke="#c07a4c"/>
+  <!-- One letter, not the two-letter monogram on the page: at 16 pixels a pair
+       of serif capitals closes up into a smudge, and the tab has to be legible
+       before it can be elegant. Georgia is the same fallback the monogram
+       plate declares behind Fraunces, so the shape stays in the family.
+       Dark ground rather than the v1 light one, because the page it stands for
+       is dark dominant and a bright tab next to a graphite page reads as a
+       different site. -->
+  <text x="32" y="33" text-anchor="middle" dominant-baseline="central"
+        fill="#f2f0ea" font-family="Georgia, 'Times New Roman', serif"
+        font-size="38" font-weight="400">A</text>
+</svg>

@@ -1,0 +1,987 @@
+/*
+Theme Name: Aldmarsh
+Theme URI: https://naeventures.github.io/onepager-concepts/one/
+Author: Aldmarsh Holdings
+Author URI: https://naeventures.github.io/onepager-concepts/one/
+Description: One-page block theme for Aldmarsh Holdings, a demonstration brand. Concept design, not a trading company. Dark instrument face, five patterns, no JavaScript, self-hosted OFL fonts, scroll-driven CSS motion. Rule 2.6 of the brief keeps the builder's brand off the three sites, so the author field carries the demonstration brand and authorship is recorded on the index page instead.
+Requires at least: 6.6
+Tested up to: 6.9
+Requires PHP: 8.0
+Version: 2.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: aldmarsh
+Tags: one-column, block-patterns, full-site-editing, accessibility-ready, custom-colors, custom-menu
+*/
+
+/* ---------------------------------------------------------------------------
+   Everything theme.json can express lives in theme.json. What is left here is
+   what it cannot: the twelve column asymmetric grid, the full bleed bands and
+   the colour flip between them, the engine-turned rosette, the sticky masthead
+   and its scroll response, focus visibility and print.
+
+   Custom properties are declared on ":root, body" rather than ":root" alone,
+   because the Gutenberg editor renders post content inside an iframe whose
+   documentElement is not the one this stylesheet's :root matches. Declaring on
+   both is what makes the patterns look the same in the canvas as on the page.
+   --------------------------------------------------------------------------- */
+
+/* 1. Tokens ---------------------------------------------------------------- */
+
+:root,
+body {
+  /* Grounds. */
+  --al-graphite: #101318;
+  --al-panel: #191d24;
+  --al-bone: #f2f0ea;
+  --al-plate: #e6e3da;
+
+  /* Marks. Every pair below is computed in lighthouse/contrast.txt. */
+  --al-body-ink: #e8eaee;
+  --al-muted-dark: #9aa3b0;
+  --al-muted-light: #5a5f68;
+  --al-copper: #c07a4c;
+  --al-copper-ink: #8a4f28;
+
+  /* Band-scoped roles. Flipped wholesale by .al-band--light, which is how one
+     set of patterns serves a dark band and a light one without a second copy.
+     theme.json points the link and heading elements at --al-accent and
+     --al-strong, so the flip reaches core block styles too. */
+  --al-strong: var(--al-bone);
+  --al-accent: var(--al-copper);
+  --al-muted: var(--al-muted-dark);
+  --al-hairline: rgba(232, 234, 238, 0.16);
+  --al-hairline-strong: rgba(232, 234, 238, 0.34);
+
+  /* Measure and gutter. The grid is 1320px, the reading measure is 40rem. */
+  --al-grid-w: 82.5rem;
+  --al-gutter: clamp(1.25rem, 5vw, 4rem);
+  --al-col-gap: clamp(1rem, 2.2vw, 2rem);
+
+  /* Fixed masthead height, so the scroll response can never shift layout. */
+  --al-mast-h: 4.25rem;
+
+  /* Micro interaction easing. One curve for reactive feedback (hover, press),
+     shared by every interactive element so the page has one motion vocabulary
+     instead of each link inventing its own timing. See section 15. */
+  --al-ease: cubic-bezier(.22, .61, .36, 1);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;
+  overflow-wrap: break-word;
+}
+
+/* Anchor navigation has to clear the sticky masthead, or the heading it lands
+   on sits behind the bar. */
+[id] {
+  scroll-margin-top: calc(var(--al-mast-h) + 2rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* 2. Bands and grid ------------------------------------------------------- */
+
+/* A band is one full bleed horizontal stripe carrying its own ground. The page
+   is a stack of five of them plus the footer, which is what turns a document
+   into a page. */
+.al-band {
+  position: relative;
+  overflow: clip;
+  padding-block: var(--wp--preset--spacing--70);
+  background-color: var(--al-graphite);
+  color: var(--al-body-ink);
+}
+
+/* overflow: clip rather than hidden, because hidden makes the band a scroll
+   container and a scroll container silently kills position: sticky inside it,
+   which is what the section labels rely on. Where art bleeds past the edge and
+   nothing inside is sticky, hidden is used instead so the clip is certain. */
+.al-band--hero,
+.al-band--light {
+  overflow: hidden;
+}
+
+.al-band--panel {
+  background-color: var(--al-panel);
+}
+
+.al-band--light {
+  background-color: var(--al-bone);
+  color: var(--al-graphite);
+  --al-strong: var(--al-graphite);
+  --al-accent: var(--al-copper-ink);
+  --al-muted: var(--al-muted-light);
+  --al-hairline: rgba(16, 19, 24, 0.16);
+  --al-hairline-strong: rgba(16, 19, 24, 0.34);
+}
+
+/* A hairline at the top of a band, drawn by the band rather than by an empty
+   element, so the markup carries no decorative divs. */
+.al-band + .al-band::before,
+.al-footer::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 1px;
+  background: var(--al-hairline);
+}
+
+.al-band--light::before {
+  background: transparent;
+}
+
+.al-grid {
+  max-width: var(--al-grid-w);
+  margin-inline: auto;
+  padding-inline: var(--al-gutter);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--al-col-gap);
+  align-items: start;
+}
+
+/* Below the breakpoint the twelve columns collapse to one and every placement
+   rule below is overridden by the single column, which is why each rule that
+   spans columns lives inside the media query. */
+@media (max-width: 47.999em) {
+  .al-grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--wp--preset--spacing--40);
+  }
+}
+
+/* 3. Masthead ------------------------------------------------------------- */
+
+.al-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--al-bone);
+  color: var(--al-graphite);
+  font-size: var(--wp--preset--font-size--label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.al-skip:focus {
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+/* Gutenberg wraps every template part in a div.wp-block-template-part. That div
+   is the masthead's containing block, and it is only as tall as the masthead
+   itself: measured at 76px against a 4391px document. position: sticky on the
+   header therefore had a 76px range and the bar scrolled away on the first
+   band, which is exactly what v1 did wrong. display: contents removes the
+   wrapper from the box tree so .wp-site-blocks becomes the containing block and
+   the sticky range is the whole page. Safe on the footer wrapper too: neither
+   wrapper carries a background, a padding or a border, the header and footer
+   elements inside them do. */
+.wp-block-template-part {
+  display: contents;
+}
+
+.al-mast {
+  position: relative;
+  z-index: 20;
+  background-color: var(--al-graphite);
+}
+
+/* Sticky from 48em up only. A two row bar pinned to a 360px screen costs more
+   of the viewport than it returns, so on a phone it scrolls away. */
+@media (min-width: 48em) {
+  .al-mast {
+    position: sticky;
+    top: 0;
+    background-color: rgba(16, 19, 24, 0.94);
+  }
+
+  /* 0.88 and not the 0.72 this started at, and the number is computed rather
+     than chosen. The bar is translucent and it travels over the bone founder
+     band, so its worst case ground is graphite composited over #f2f0ea, which
+     at 0.72 is #4f5153. The muted nav grey on that is 3.13:1, a real AA
+     failure, and the only ground Lighthouse would ever sample is the dark one.
+     At 0.88 the worst case ground is #2b2e31 and the same grey reaches 5.36:1.
+     Both numbers are in lighthouse/contrast.txt. */
+  @supports (backdrop-filter: blur(6px)) {
+    .al-mast {
+      background-color: rgba(16, 19, 24, 0.88);
+      backdrop-filter: saturate(150%) blur(10px);
+    }
+  }
+}
+
+/* The hairline under the bar is a pseudo-element so it can be faded in by the
+   scroll timeline without touching the bar's height. */
+.al-mast::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--al-copper);
+  opacity: 0.34;
+}
+
+.al-mast__inner {
+  max-width: var(--al-grid-w);
+  margin-inline: auto;
+  padding: 0.6rem var(--al-gutter) 0.55rem;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  row-gap: 0.35rem;
+  min-height: var(--al-mast-h);
+  box-sizing: border-box;
+}
+
+.al-mast__mark {
+  font-family: var(--wp--preset--font-family--display);
+  font-variation-settings: "opsz" 72, "wght" 420;
+  font-size: 1.0625rem;
+  line-height: 1.1;
+  letter-spacing: 0.005em;
+  color: var(--al-bone);
+  transform-origin: left center;
+}
+
+.al-mast__place {
+  grid-column: 2;
+  font-size: var(--wp--preset--font-size--label);
+  line-height: 1.1;
+  color: var(--al-muted-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  text-align: right;
+}
+
+.al-nav {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 clamp(0.75rem, 2vw, 1.75rem);
+  margin: 0;
+}
+
+.al-nav p {
+  margin: 0;
+}
+
+.al-nav a {
+  display: inline-flex;
+  align-items: center;
+  /* WCAG 2.5.8 asks for a 24 by 24 CSS pixel target. The label is 12px, so the
+     padding is what gets it there, and it is built in rather than found by a
+     Lighthouse run. */
+  min-height: 24px;
+  padding: 0.3rem 0;
+  font-size: var(--wp--preset--font-size--label);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--al-muted-dark);
+  text-decoration: none;
+  transition: color 0.15s var(--al-ease), transform 0.15s var(--al-ease);
+}
+
+.al-nav a:hover,
+.al-nav a:focus-visible {
+  color: var(--al-bone);
+  transform: translateY(-1px);
+}
+
+.al-nav a:active {
+  transform: translateY(0);
+  transition-duration: 0.08s;
+}
+
+/* 4. Section label -------------------------------------------------------- */
+
+/* The label hangs in columns 1 to 3 and stays with the reader while the section
+   scrolls, which is the only wayfinding on a page with no chrome. It is a real
+   h2, so the page has a heading outline for a screen reader and for a crawler,
+   and it therefore has to override the display face theme.json puts on every
+   heading. */
+h2.al-label,
+.al-label {
+  font-family: var(--wp--preset--font-family--text);
+  font-size: var(--wp--preset--font-size--label);
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 500;
+  color: var(--al-muted);
+  margin: 0;
+}
+
+/* The copper tick is not inside the breakpoint. It is the only thing marking a
+   section start on a phone, where the label loses its hanging column and would
+   otherwise be one small grey line in the middle of a stack of bands. */
+.al-label::before {
+  content: "";
+  display: block;
+  width: 2rem;
+  height: 1px;
+  margin-bottom: 0.9rem;
+  background: var(--al-accent);
+}
+
+@media (min-width: 48em) {
+  .al-label {
+    grid-column: 1 / 4;
+    position: sticky;
+    top: calc(var(--al-mast-h) + 2.5rem);
+    padding-top: 0.55rem;
+  }
+}
+
+/* 5. Prose ---------------------------------------------------------------- */
+
+.al-prose {
+  max-width: 40rem;
+}
+
+.al-prose > p + p {
+  margin-top: 1.35em;
+}
+
+.al-prose p {
+  color: inherit;
+}
+
+@media (min-width: 48em) {
+  .al-prose {
+    grid-column: 5 / 12;
+  }
+}
+
+/* 6. Hero ----------------------------------------------------------------- */
+
+.al-band--hero {
+  padding-block: calc(var(--wp--preset--spacing--60) + 1rem) var(--wp--preset--spacing--60);
+}
+
+.al-hero__body {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 48em) {
+  .al-hero__body {
+    grid-column: 1 / 8;
+  }
+}
+
+@media (min-width: 64em) {
+  .al-band--hero {
+    min-height: min(86svh, 54rem);
+    display: flex;
+    align-items: center;
+  }
+
+  .al-band--hero > .al-grid {
+    width: 100%;
+  }
+}
+
+.al-eyebrow {
+  font-size: var(--wp--preset--font-size--label);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 500;
+  color: var(--al-copper);
+  margin: 0 0 clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.al-wordmark {
+  font-family: var(--wp--preset--font-family--display);
+  font-variation-settings: "opsz" 144, "wght" 320;
+  font-size: var(--wp--preset--font-size--wordmark);
+  line-height: 0.94;
+  letter-spacing: -0.022em;
+  color: var(--al-bone);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.al-standfirst {
+  font-size: var(--wp--preset--font-size--heading);
+  font-family: var(--wp--preset--font-family--display);
+  font-variation-settings: "opsz" 40, "wght" 300;
+  line-height: 1.22;
+  letter-spacing: -0.008em;
+  color: var(--al-body-ink);
+  max-width: 32ch;
+  margin: clamp(1.5rem, 3.5vw, 2.5rem) 0 0;
+}
+
+/* 7. The rosette ---------------------------------------------------------- */
+
+/* Three generated layers, each delivered as a CSS mask rather than as an image,
+   so the stylesheet owns the colour and one set of files serves a dark band and
+   a light one. Generated by tools/art-rosette.py from hypotrochoid and petal
+   maths: there is nothing here to license, which is what rule 2.5 asks for.
+
+   The container is deliberately unmasked. A masked element clips the paint of
+   everything inside it, so putting the outer ring's mask on the container made
+   the two inner layers invisible: they only showed through the outer ring's own
+   strokes. The layers are therefore siblings, which also lets each one carry its
+   own rotation instead of inheriting its parent's.
+
+   It lives in its own grid cell and bleeds about a quarter of its width past the
+   right edge of the band. It is never behind text, on any screen size, so every
+   pair in lighthouse/contrast.txt is a real flat pair rather than a guess about
+   what a reader gets at the crossing of a line. */
+.al-rosette {
+  position: relative;
+  aspect-ratio: 1;
+  margin-inline-start: auto;
+  width: 126%;
+  margin-inline-end: -30%;
+  pointer-events: none;
+}
+
+@media (min-width: 48em) {
+  .al-rosette {
+    grid-column: 8 / 13;
+    width: 150%;
+    margin-inline-end: -52%;
+    align-self: center;
+  }
+}
+
+.al-rosette::before,
+.al-rosette::after,
+.al-rosette__in {
+  content: "";
+  position: absolute;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  will-change: transform;
+}
+
+/* Alpha is mixed into the colour rather than set with opacity, because opacity
+   would form a stacking group per layer and cap how bright the layer above can
+   be. color-mix keeps the palette as the single source of the hex. */
+.al-rosette::before {
+  inset: 0;
+  background-color: color-mix(in srgb, var(--al-copper) 38%, transparent);
+  mask-image: url("assets/img/rosette-outer.svg");
+  -webkit-mask-image: url("assets/img/rosette-outer.svg");
+}
+
+.al-rosette::after {
+  inset: 9%;
+  background-color: color-mix(in srgb, var(--al-bone) 30%, transparent);
+  mask-image: url("assets/img/rosette-mid.svg");
+  -webkit-mask-image: url("assets/img/rosette-mid.svg");
+}
+
+.al-rosette__in {
+  inset: 26%;
+  background-color: color-mix(in srgb, var(--al-copper) 82%, transparent);
+  mask-image: url("assets/img/rosette-core.svg");
+  -webkit-mask-image: url("assets/img/rosette-core.svg");
+}
+
+/* 8. Rule and pair -------------------------------------------------------- */
+
+/* The copper hairline. Core's blocks/separator/theme.css sets
+   .wp-block-separator:not(.is-style-wide):not(.is-style-dots) to width: 100px
+   and auto side margins, at three classes of specificity, so a plain hr.al-rule
+   lost to it: measured in the browser, the hairline computed to width 100px
+   while max-width: 26rem from the same block applied, which is what gave it
+   away. That stylesheet is no longer shipped, functions.php dequeues both
+   separator handles, and the reason there is the middot in its dots rule rather
+   than this fight. The two :not() clauses stay anyway, at the cost of nothing,
+   so the hairline is still correct if that stylesheet ever comes back. */
+hr.al-rule:not(.is-style-wide):not(.is-style-dots) {
+  border: 0;
+  border-top: 1px solid var(--al-accent);
+  width: 100%;
+  max-width: 26rem;
+  margin: clamp(2rem, 5vw, 3.25rem) 0 0;
+  opacity: 0.85;
+}
+
+.al-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 2.5rem;
+  margin-top: 1.1rem;
+}
+
+.al-pair p {
+  margin: 0;
+  font-size: var(--wp--preset--font-size--small);
+  color: var(--al-muted);
+}
+
+/* The italic is the founder's own voice on this page, and it is the only place
+   the second display file is used besides the signature, which is what earns
+   its 21 KB. */
+.al-voice {
+  font-family: var(--wp--preset--font-family--display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.125rem;
+  letter-spacing: 0.004em;
+}
+
+/* 9. The founder --------------------------------------------------------- */
+
+/* The left column of this band carries the label and the plate together, so it
+   is one grid item rather than two, and the whole column is what sticks. */
+.al-founder__aside {
+  display: grid;
+  justify-items: start;
+}
+
+@media (min-width: 48em) {
+  .al-founder__aside {
+    grid-column: 1 / 5;
+    position: sticky;
+    top: calc(var(--al-mast-h) + 3rem);
+  }
+
+  /* The label is already inside a sticky column, so it must not try to stick
+     again inside it. */
+  .al-founder__aside .al-label {
+    position: static;
+    grid-column: auto;
+  }
+}
+
+.al-plate-wrap {
+  position: relative;
+  width: fit-content;
+  margin-top: clamp(2.5rem, 7vw, 5.5rem);
+}
+
+/* The rosette sits behind the panel and shows around its edges. It is never
+   under the letters, which is why the initials can be measured against a flat
+   ground, and it is sized off the plate rather than off the column so the
+   overhang cannot reach the label above it or the bio beside it. */
+.al-plate-wrap::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 168%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background-color: color-mix(in srgb, var(--al-graphite) 15%, transparent);
+  mask: url("assets/img/rosette-mid.svg") center / contain no-repeat;
+  -webkit-mask: url("assets/img/rosette-mid.svg") center / contain no-repeat;
+  pointer-events: none;
+}
+
+.al-plate {
+  position: relative;
+  z-index: 1;
+  width: clamp(9rem, 26vw, 14rem);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  background-color: var(--al-plate);
+  box-shadow: 0 0 0 1px rgba(16, 19, 24, 0.1);
+}
+
+.al-plate__initials {
+  font-family: var(--wp--preset--font-family--display);
+  font-variation-settings: "opsz" 144, "wght" 300;
+  font-size: clamp(3.5rem, 10vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--al-graphite);
+  margin: 0;
+}
+
+.al-founder__body {
+  max-width: 40rem;
+}
+
+@media (min-width: 48em) {
+  .al-founder__body {
+    grid-column: 6 / 13;
+  }
+}
+
+.al-name {
+  font-family: var(--wp--preset--font-family--display);
+  font-variation-settings: "opsz" 60, "wght" 380;
+  font-size: var(--wp--preset--font-size--heading);
+  line-height: 1.1;
+  letter-spacing: -0.012em;
+  color: var(--al-strong);
+  margin: 0;
+}
+
+.al-role {
+  font-size: var(--wp--preset--font-size--label);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--al-muted);
+  margin: 0.6rem 0 clamp(1.75rem, 4vw, 2.5rem);
+}
+
+.al-sig {
+  font-family: var(--wp--preset--font-family--display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+  line-height: 1;
+  color: var(--al-accent);
+  margin: 1.25rem 0 0;
+}
+
+/* 10. Focus -------------------------------------------------------------- */
+
+/* Four areas, a set and not a sequence, so there are no numerals anywhere on
+   this site. Each row is the full width of the grid, and the rule above it is
+   the only ornament in the band. */
+.al-focus {
+  margin: 0;
+}
+
+@media (min-width: 48em) {
+  .al-focus {
+    grid-column: 5 / 13;
+  }
+}
+
+.al-focus__row {
+  display: grid;
+  gap: 0.5rem;
+  padding-block: clamp(1.5rem, 3.5vw, 2.25rem);
+  border-top: 1px solid var(--al-hairline);
+}
+
+.al-focus__row:first-child {
+  border-top-color: var(--al-hairline-strong);
+}
+
+@media (min-width: 62em) {
+  .al-focus__row {
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: 0 var(--al-col-gap);
+    align-items: baseline;
+  }
+}
+
+.al-focus__term {
+  margin: 0;
+  font-size: var(--wp--preset--font-size--label);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  color: var(--al-accent);
+}
+
+.al-focus__line {
+  margin: 0;
+  font-family: var(--wp--preset--font-family--display);
+  font-variation-settings: "opsz" 32, "wght" 300;
+  font-size: var(--wp--preset--font-size--lead);
+  line-height: 1.32;
+  letter-spacing: -0.006em;
+  color: var(--al-strong);
+  max-width: 44rem;
+}
+
+/* 11. Contact ------------------------------------------------------------ */
+
+.al-contact__body {
+  max-width: 44rem;
+}
+
+@media (min-width: 48em) {
+  .al-contact__body {
+    grid-column: 5 / 13;
+  }
+}
+
+.al-mail {
+  margin: clamp(1.5rem, 4vw, 2.5rem) 0 0;
+  font-family: var(--wp--preset--font-family--display);
+  font-variation-settings: "opsz" 144, "wght" 300;
+  font-size: var(--wp--preset--font-size--display);
+  line-height: 1.02;
+  letter-spacing: -0.024em;
+}
+
+.al-mail a {
+  color: var(--al-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom-color 0.18s var(--al-ease), transform 0.18s var(--al-ease);
+}
+
+.al-mail a:hover,
+.al-mail a:focus-visible {
+  border-bottom-color: currentColor;
+  transform: translateY(-2px);
+}
+
+.al-mail a:active {
+  transform: translateY(0);
+  transition-duration: 0.08s;
+}
+
+/* 12. Footer ------------------------------------------------------------- */
+
+.al-footer {
+  position: relative;
+  background-color: var(--al-graphite);
+  color: var(--al-muted-dark);
+  padding: var(--wp--preset--spacing--40) 0 var(--wp--preset--spacing--40);
+}
+
+.al-footer__inner {
+  max-width: var(--al-grid-w);
+  margin-inline: auto;
+  padding-inline: var(--al-gutter);
+  display: grid;
+  gap: 0.5rem;
+  font-size: var(--wp--preset--font-size--label);
+  line-height: 1.6;
+}
+
+.al-footer__inner p {
+  margin: 0;
+}
+
+@media (min-width: 48em) {
+  .al-footer__inner {
+    grid-template-columns: auto 1fr auto;
+    gap: 0 var(--al-col-gap);
+    align-items: baseline;
+  }
+
+  .al-footer__disclosure {
+    text-align: center;
+  }
+}
+
+.al-footer__mark {
+  color: var(--al-bone);
+  font-family: var(--wp--preset--font-family--display);
+  font-variation-settings: "opsz" 60, "wght" 400;
+  font-size: 0.9375rem;
+}
+
+/* 13. Focus visibility --------------------------------------------------- */
+
+a:focus-visible,
+:focus-visible {
+  outline: 2px solid var(--al-accent);
+  outline-offset: 3px;
+}
+
+.al-band--hero :focus-visible,
+.al-mast :focus-visible {
+  outline-color: var(--al-copper);
+}
+
+/* 14. Motion ------------------------------------------------------------- */
+
+/* The contract: transform, opacity and clip-path only, nothing that triggers
+   layout; every animation inside @supports for the scroll driven timelines, so
+   a browser without them gets the final state rather than a broken one; and all
+   of it off under prefers-reduced-motion. No JavaScript, therefore no
+   observer, no class flipping and no layout shift. Support for
+   animation-timeline is Chrome and Edge 115 up, Safari 26 up, Firefox 132 up.
+   Everything else sees the finished page, which is the point. */
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+
+    /* NO OPACITY ON ANYTHING THAT CARRIES TEXT. Measured, not a preference: the
+       first version faded these in, and Lighthouse mobile came back 89 on
+       accessibility with axe reporting the focus terms at 1.41:1, foreground
+       #3c2d25 on #101318. That is the copper composited against the graphite
+       ground at the fraction of the fade axe happened to sample, and axe is
+       right about it: half faded text at 11px is not readable, and a ratio
+       computed on the declared colour would have been a number no reader ever
+       gets. So text reveals with transform and clip-path only, where the
+       colour is constant through every frame and the ratios in
+       lighthouse/contrast.txt are true at any moment of the animation. Opacity
+       stays legal on the hairline below, which carries no text. */
+
+    /* Subtle everywhere: each block rises into place as it enters. */
+    .al-reveal {
+      animation: al-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 8% entry 62%;
+    }
+
+    @keyframes al-rise {
+      from {
+        transform: translateY(1.5rem);
+      }
+      to {
+        transform: none;
+      }
+    }
+
+    /* The focus rows draw themselves left to right as they arrive. The wipe is
+       the whole effect now that the fade is gone, so it runs the full width
+       rather than starting a quarter visible. */
+    .al-focus__row {
+      animation: al-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 6% entry 52%;
+    }
+
+    @keyframes al-draw {
+      from {
+        clip-path: inset(0 100% 0 0);
+      }
+      to {
+        clip-path: inset(0 0 0 0);
+      }
+    }
+
+    /* The signature moment: the three rosette layers counter-rotate through
+       the first screen of scroll, so the plate turns like an engine-turning
+       lathe rather than sliding like a parallax panel. The three layers are
+       siblings, so the turns are independent: plus 14, minus 26 and plus 20
+       degrees across the first screen of scroll. */
+    .al-rosette::before,
+    .al-rosette::after,
+    .al-rosette__in {
+      animation: linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+    }
+
+    .al-rosette::before {
+      animation-name: al-turn-a;
+    }
+
+    .al-rosette::after {
+      animation-name: al-turn-b;
+    }
+
+    .al-rosette__in {
+      animation-name: al-turn-c;
+    }
+
+    @keyframes al-turn-a {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(14deg); }
+    }
+
+    @keyframes al-turn-b {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-26deg); }
+    }
+
+    @keyframes al-turn-c {
+      from { transform: rotate(0deg) scale(1); }
+      to { transform: rotate(20deg) scale(1.04); }
+    }
+
+    /* The masthead thins its wordmark and firms its hairline once the reader
+       has left the hero. Height never changes, so nothing below it moves. */
+    .al-mast__mark {
+      animation: al-mark linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 12rem;
+    }
+
+    @keyframes al-mark {
+      from { transform: scale(1); }
+      to { transform: scale(0.88); }
+    }
+
+    .al-mast::after {
+      animation: al-hair linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 12rem;
+    }
+
+    @keyframes al-hair {
+      from { opacity: 0.18; }
+      to { opacity: 0.85; }
+    }
+  }
+}
+
+/* 15. Micro interaction --------------------------------------------------- */
+
+/* Section 14 is macro motion: page load and scroll driven, gated behind
+   @supports so a browser without animation-timeline gets the finished state
+   with no JavaScript fallback. This is the other scale, reactive feedback on
+   the two things a reader actually touches, the nav and the mail line, and
+   it needs the opposite guard. There is nothing to feature detect (CSS
+   transitions have been supported forever), so instead of gating the effect
+   on, reduced motion gates it off: durations collapse to near zero, which
+   keeps every hover and press state working (the colour still changes, the
+   line still draws) while removing the glide. This is the mandatory guard
+   from ~/interface-craft's motion.css, not an invention for this file.
+
+   The lift is shared by :hover and :focus-visible, so a keyboard user gets
+   the same lift a mouse user gets on hover. The outline itself is not part
+   of this: section 13 leaves it untransitioned on purpose, since it is the
+   one signal a keyboard user is actually waiting for, and delaying it even
+   150ms to ease it in would cost more than the polish is worth. */
+
+@media (prefers-reduced-motion: reduce) {
+  .al-nav a,
+  .al-mail a {
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* 16. Print -------------------------------------------------------------- */
+
+@media print {
+  .al-mast,
+  .al-rosette,
+  .al-skip {
+    display: none;
+  }
+
+  .al-band,
+  .al-footer {
+    background: #fff;
+    color: #000;
+    padding-block: 1.5rem;
+  }
+
+  .al-band--light {
+    background: #fff;
+  }
+
+  .al-wordmark,
+  .al-name,
+  .al-focus__line,
+  .al-standfirst {
+    color: #000;
+  }
+
+  .al-mail {
+    font-size: 1.25rem;
+  }
+}
